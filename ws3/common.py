@@ -109,6 +109,8 @@ def clean_vector_data(src_path, dst_path, dst_name, prop_names, clean=True, tole
     The output of the function is the path for cleaned shapefile and uncleaned shapefile.
 
     Parameters:
+    :param str src_path: Path to the source shapefile.
+    
     - src_path: Path to the source shapefile.
     - dst_path: Path to the destination shapefile.
     - dst_name: The name for the destination shapefile.
