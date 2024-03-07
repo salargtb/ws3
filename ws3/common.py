@@ -110,6 +110,7 @@ def clean_vector_data(src_path, dst_path, dst_name, prop_names, clean=True, tole
 
     
     :param str src_path: Path to the source shapefile.
+    :param str dst_path: Path to the destination shapefile.
     
     - src_path: Path to the source shapefile.
     - dst_path: Path to the destination shapefile.
