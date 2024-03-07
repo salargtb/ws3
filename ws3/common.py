@@ -108,24 +108,21 @@ def clean_vector_data(src_path, dst_path, dst_name, prop_names, clean=True, tole
     The function cleans a vector data obtained form shapefile and reprojects to a destination shapefile.
     The output of the function is the path for cleaned shapefile and uncleaned shapefile.
 
-    
     :param str src_path: Path to the source shapefile.
     :param str dst_path: Path to the destination shapefile.
-    
-    - src_path: Path to the source shapefile.
-    - dst_path: Path to the destination shapefile.
-    - dst_name: The name for the destination shapefile.
-    - prop_names: List of property names
-    - clean: If the value of clean is True, the function will do cleaning; otherwise, it will do only reprojecting.
-    - tolerance: This tolerance adjust the level of geometry modifications.
-    - preserve_topology: If the value of preserve_topology is True,it will perserve the topology.
-    - logfn: The filename for the log file to store the cleaned info.
-    - max_records: If required, the user can define the maximum number of records for processing the source shapefile.
-    - theme0: If required, the user can define theme0 for the cleaned shapefile.
-    - prop_types: List of tuples showing the property types for the cleaned shapefile.
-    - driver: The driver for writing the shapfiles.
-    - dst_epsg: If the user specifies dst_epsg, the geometries will be reprojected to the specific CRS.
-    - update_area_prop: The property that includes updated area information.
+    :param str dst_name: The name for the destination shapefile.
+    :param list prop_names: List of property names.
+    :param bool clean: If the value of clean is True, the function will do cleaning; otherwise, it will do only reprojecting.
+    :param float tolerance: This tolerance adjust the level of geometry modifications.
+    :param bool preserve_topology: If the value of preserve_topology is True,it will perserve the topology.
+    :param str logfn: The filename for the log file to store the cleaned info.
+    :param int max_records: If required, the user can define the maximum number of records for processing the source shapefile.
+    :param str theme0: If required, the user can define theme0 for the cleaned shapefile.
+    :param list prop_types: List of tuples showing the property types for the cleaned shapefile.
+    :param str driver: The driver for writing the shapfiles.
+    :param int dst_epsg: If the user specifies dst_epsg, the geometries will be reprojected to the specific CRS.
+    :param str update_area_prop: The property that includes updated area information.
+
     """
     import logging
     import sys
@@ -206,11 +203,11 @@ def reproject_vector_data(src_path, snk_path, snk_epsg, driver='ESRI Shapefile')
     """
     When a specific ESPG is defined, this function reprojects vector data from a source shapefile to a destinaiton shapefile using ESRI shapefile as the default driver.
 
-    Parameters:
-    - src_path: Path to the source shapefile.
-    - snk_path: Path to the destination shapefile.
-    - snk_epsg: EPSG code for the destination CRS.
-    - driver: The driver for writing the shapfiles.
+    :param str src_path: Path to the source shapefile.
+    :param str snk_path: Path to the destination shapefile.
+    :param int snk_epsg: EPSG code for the destination CRS.
+    :param str driver: The driver for writing the shapfiles.
+
         
     """
     import fiona
@@ -234,20 +231,21 @@ def rasterize_stands(shp_path, tif_path, theme_cols, age_col, blk_col='', age_di
     """
     The function rasterize stands data and store the data as TIFF file.
 
-    Parameters:
-    - shp_path
-    - tif_path
-    - theme_cols
-    - age_col
-    - blk_col
-    - age_divisor
-    - d
-    - dtype
-    - compress
-    - round_coords
-    - value_func
-    - cap_age
-    - verbose
+    :param str shp_path: Path to the source shapefile.
+    :param str tif_path: Path to the resulted TIFF file.
+    :param list theme_cols: List of themes.
+    :param int age_col: Age column.
+    :param str blk_col: 
+    :param float age_divisor: A number to scale stand age values.
+    :param float d: The pixel size of the raster.
+    :param rasterio.dtype dtype: The type of the output file (default type is rasterio.int32).
+    :param str compress: The compression method (The default one is lzw)
+    :param bool round_coords: If ture, the function rounds the coordinates of the ouput file.
+    :param function value_func: A function that is applied to theme columns (in this case, the function replaces hyphens and spaces with underscores and changes all letters to lowercase)
+    :param int cap_age: Maximum stand age defined by usder that will be considered as a cap age for stands (optional)
+    :param bool verbose: (Optional) Verbosity flag. Defaults to False
+
+
     """
     import fiona
     from rasterio.features import rasterize
