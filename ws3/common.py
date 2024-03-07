@@ -80,6 +80,10 @@ from fiona.transform import transform_geom
 from fiona.crs import from_epsg
 
 def is_num(s):
+    """
+    This function checks if a given input has a numerical value.
+        
+    """
     try:
         float(s)
         return True
@@ -87,6 +91,10 @@ def is_num(s):
         return False
 
 def reproject(f, srs_crs, dst_crs):
+    """
+    Reproject a geometry from a source coordinate reference system (CRS) to a destination CRS.
+        
+    """
     f['geometry'] = transform_geom(srs_crs, dst_crs, f['geometry'],
                           antimeridian_cutting=False,
                           precision=-1)
@@ -96,6 +104,26 @@ def clean_vector_data(src_path, dst_path, dst_name, prop_names, clean=True, tole
                       preserve_topology=True, logfn='clean_stand_shapefile.log', max_records=None,
                       theme0=None, prop_types=None, driver='ESRI Shapefile', dst_epsg=None,
                       update_area_prop=''):
+    """
+    The function cleans a vector data obtained form shapefile and reprojects to a destination shapefile.
+    The output of the function is the path for cleaned shapefile and uncleaned shapefile.
+
+    Parameters:
+    - src_path: Path to the source shapefile.
+    - dst_path: Path to the destination shapefile.
+    - dst_name: The name for the destination shapefile.
+    - prop_names: List of property names
+    - clean: If the value of clean is True, the function will do cleaning; otherwise, it will do only reprojecting.
+    - tolerance: This tolerance adjust the level of geometry modifications.
+    - preserve_topology: If the value of preserve_topology is True,it will perserve the topology.
+    - logfn: The filename for the log file to store the cleaned info.
+    - max_records: If required, the user can define the maximum number of records for processing the source shapefile.
+    - theme0: If required, the user can define theme0 for the cleaned shapefile.
+    - prop_types: List of tuples showing the property types for the cleaned shapefile.
+    - driver: The driver for writing the shapfiles.
+    - dst_epsg: If the user specifies dst_epsg, the geometries will be reprojected to the specific CRS.
+    - update_area_prop: The property that includes updated area information.
+    """
     import logging
     import sys
     from shapely.geometry import mapping, shape, Polygon, MultiPolygon
@@ -172,6 +200,16 @@ def clean_vector_data(src_path, dst_path, dst_name, prop_names, clean=True, tole
 
 
 def reproject_vector_data(src_path, snk_path, snk_epsg, driver='ESRI Shapefile'):
+    """
+    When a specific ESPG is defined, this function reprojects vector data from a source shapefile to a destinaiton shapefile using ESRI shapefile as the default driver.
+
+    Parameters:
+    - src_path: Path to the source shapefile.
+    - snk_path: Path to the destination shapefile.
+    - snk_epsg: EPSG code for the destination CRS.
+    - driver: The driver for writing the shapfiles.
+        
+    """
     import fiona
     from fiona.crs import from_epsg
     from pyproj import Proj, transform
@@ -191,7 +229,22 @@ def rasterize_stands(shp_path, tif_path, theme_cols, age_col, blk_col='', age_di
                      value_func=lambda x: re.sub(r'(-| )+', '_', str(x).lower()), cap_age=None,
                      verbose=False):
     """
-    Rasterize vector stand data.
+    The function rasterize stands data and store the data as TIFF file.
+
+    Parameters:
+    - shp_path
+    - tif_path
+    - theme_cols
+    - age_col
+    - blk_col
+    - age_divisor
+    - d
+    - dtype
+    - compress
+    - round_coords
+    - value_func
+    - cap_age
+    - verbose
     """
     import fiona
     from rasterio.features import rasterize
