@@ -108,7 +108,7 @@ def clean_vector_data(src_path, dst_path, dst_name, prop_names, clean=True, tole
     The function cleans a vector data obtained form shapefile and reprojects to a destination shapefile.
     The output of the function is the path for cleaned shapefile and uncleaned shapefile.
 
-    Parameters:
+    
     :param str src_path: Path to the source shapefile.
     
     - src_path: Path to the source shapefile.
