@@ -80,6 +80,10 @@ from fiona.transform import transform_geom
 from fiona.crs import from_epsg
 
 def is_num(s):
+    """
+    This function checks if a given input has a numerical value.
+        
+    """
     try:
         float(s)
         return True
@@ -87,6 +91,10 @@ def is_num(s):
         return False
 
 def reproject(f, srs_crs, dst_crs):
+    """
+    Reproject a geometry from a source coordinate reference system (CRS) to a destination CRS.
+        
+    """
     f['geometry'] = transform_geom(srs_crs, dst_crs, f['geometry'],
                           antimeridian_cutting=False,
                           precision=-1)
@@ -96,6 +104,26 @@ def clean_vector_data(src_path, dst_path, dst_name, prop_names, clean=True, tole
                       preserve_topology=True, logfn='clean_stand_shapefile.log', max_records=None,
                       theme0=None, prop_types=None, driver='ESRI Shapefile', dst_epsg=None,
                       update_area_prop=''):
+    """
+    The function cleans a vector data obtained form shapefile and reprojects to a destination shapefile.
+    The output of the function is the path for cleaned shapefile and uncleaned shapefile.
+
+    :param str src_path: Path to the source shapefile.
+    :param str dst_path: Path to the destination shapefile.
+    :param str dst_name: The name for the destination shapefile.
+    :param list prop_names: List of property names.
+    :param bool clean: If the value of clean is True, the function will do cleaning; otherwise, it will do only reprojecting.
+    :param float tolerance: This tolerance adjust the level of geometry modifications.
+    :param bool preserve_topology: If the value of preserve_topology is True,it will perserve the topology.
+    :param str logfn: The filename for the log file to store the cleaned info.
+    :param int max_records: If required, the user can define the maximum number of records for processing the source shapefile.
+    :param str theme0: If required, the user can define theme0 for the cleaned shapefile.
+    :param list prop_types: List of tuples showing the property types for the cleaned shapefile.
+    :param str driver: The driver for writing the shapfiles.
+    :param int dst_epsg: If the user specifies dst_epsg, the geometries will be reprojected to the specific CRS.
+    :param str update_area_prop: The property that includes updated area information.
+
+    """
     import logging
     import sys
     from shapely.geometry import mapping, shape, Polygon, MultiPolygon
@@ -172,6 +200,16 @@ def clean_vector_data(src_path, dst_path, dst_name, prop_names, clean=True, tole
 
 
 def reproject_vector_data(src_path, snk_path, snk_epsg, driver='ESRI Shapefile'):
+    """
+    When a specific ESPG is defined, this function reprojects vector data from a source shapefile to a destinaiton shapefile using ESRI shapefile as the default driver.
+
+    :param str src_path: Path to the source shapefile.
+    :param str snk_path: Path to the destination shapefile.
+    :param int snk_epsg: EPSG code for the destination CRS.
+    :param str driver: The driver for writing the shapfiles.
+
+        
+    """
     import fiona
     from fiona.crs import from_epsg
     from pyproj import Proj, transform
@@ -191,7 +229,23 @@ def rasterize_stands(shp_path, tif_path, theme_cols, age_col, blk_col='', age_di
                      value_func=lambda x: re.sub(r'(-| )+', '_', str(x).lower()), cap_age=None,
                      verbose=False):
     """
-    Rasterize vector stand data.
+    The function rasterizes stands data and stores the data as TIFF file.
+
+    :param str shp_path: Path to the source shapefile.
+    :param str tif_path: Path to the resulted TIFF file.
+    :param list theme_cols: List of themes.
+    :param int age_col: Age column.
+    :param str blk_col: 
+    :param float age_divisor: A number to scale stand age values.
+    :param float d: The pixel size of the raster.
+    :param rasterio.dtype dtype: The type of the output file (default type is rasterio.int32).
+    :param str compress: The compression method (The default one is lzw)
+    :param bool round_coords: If ture, the function rounds the coordinates of the ouput file.
+    :param function value_func: A function that is applied to theme columns (in this case, the function replaces hyphens and spaces with underscores and changes all letters to lowercase)
+    :param int cap_age: Maximum stand age defined by usder that will be considered as a cap age for stands (optional)
+    :param bool verbose: (Optional) Verbosity flag. Defaults to False
+
+
     """
     import fiona
     from rasterio.features import rasterize
@@ -264,12 +318,28 @@ def rasterize_stands(shp_path, tif_path, theme_cols, age_col, blk_col='', age_di
         
 
 def hash_dt(dt, dtype=rasterio.int32, nbytes=4):
+    """
+    The function hashes the development type and returns an integer value.
+
+    :param str dt: Development type.
+    :param rasterio.dtype dtype: The type of the output file (default type is rasterio.int32).
+    :param int nbytes: The number of bytes to consider from the hash (The default value is 4).
+
+    """
     s = '.'.join(map(str, dt)).encode('utf-8')
     d = hashlib.md5(s).digest() # first n bytes of md5 digest
     return np.dtype(dtype).type(int(binascii.hexlify(d[:4]), 16))
 
 
 def warp_raster(src, dst_path, dst_crs={'init':'EPSG:4326'}):
+    """
+    The function warpes a raster from its original CRS to a new CRS.
+
+    :param raserio.DatasetReader src: The source rasterio dataset to be warped.
+    :param str dst_path: The path to save the warped raster
+    :param dict dst_crs: The destination CRS in rasterio format (Default is init':'EPSG:4326')
+
+    """
     from rasterio.warp import calculate_default_transform, reproject
     from rasterio.enums import Resampling
     dst_t, dst_w, dst_h = calculate_default_transform(src.crs, dst_crs, src.width, src.height, *src.bounds)
@@ -287,6 +357,13 @@ def warp_raster(src, dst_path, dst_crs={'init':'EPSG:4326'}):
 
 
 def timed(func):
+    """
+    The function records the execution time of a function.
+
+    :param function func: The function to be timed.
+
+
+    """
     def wrapper(*args):
         t = time.time()
         result = func(*args)
@@ -421,7 +498,8 @@ SPECIES_GROUPS_WOODSTOCK_QC  = {
 
 def is_num(s):
     """
-    Returns True if s is a number.
+    This function checks if a given input has a numerical value.
+        
     """
     try:
         float(s)
@@ -617,8 +695,14 @@ def _sylv_cred_f7(P,
 
 def sylv_cred(P, vr, vp, formula):
     """
-    Returns sylviculture credit ($ per hectare), given P (volume harvested per hectare), vr (mean piece size of harvested stems), vp (mean piece size of stand before harvesting), and formula index (1 to 7).
-    Assumes that variables (P, vr, vp) are deterministic.
+    This function returns sylviculture credit ($ per hectare).
+
+    :param float P: Volume harvested per hectare.
+    :param float vr: Mean piece size of harvested stems.
+    :param float vp: mean piece size of stand before harvesting.
+    :param formula: formula index (1 to 7).
+
+        
     """
     f = {1:_sylv_cred_f1,
          2:_sylv_cred_f2,
@@ -634,10 +718,17 @@ def sylv_cred_rv(P_mu, P_sigma, tv_mu, tv_sigma, N_mu, N_sigma, psr,
                  treatment_type=None, cover_type=None, formula=None,
                  P_min=20., tv_min=50., N_min=200., ps_min=0.05,
                  E_fromintegral=False, e=0.01, n=1000):
+    
     """
-    Returns sylviculture credit ($ per hectare), given P (volume harvested per hectare), vr (mean piece size of harvested stems), vp (mean piece size of stand before harvesting), and formula index (1 to 7).
-    Assumes that variables (P, vr, vp) are random variates (returns expected value of function, using PaCAL packages to model random variates, assuming normal distribution for all three variables).
-    Can use either PaCAL numerical integration (sssslow!), or custom numerical integration using Monte Carlo sampling (default).
+    This function returns sylviculture credit ($ per hectare).
+
+    :param float P: Volume harvested per hectare.
+    :param float vr: Mean piece size of harvested stems.
+    :param float vp: mean piece size of stand before harvesting.
+    :param formula: formula index (1 to 7).
+
+    .. Note:: Assumes that variables (P, vr, vp) are random variates (returns expected value of function, using PaCAL packages to model random variates, assuming normal distribution for all three variables).
+    Can use either PaCAL numerical integration (sssslow!), or custom numerical integration using Monte Carlo sampling (default).   
     """
     if treatment_type and cover_type:
         formula = sylv_cred_formula(treatment_type, cover_type)
@@ -678,7 +769,9 @@ def sylv_cred_rv(P_mu, P_sigma, tv_mu, tv_sigma, N_mu, N_sigma, psr,
 
 def sylv_cred_formula(treatment_type, cover_type):
     """
-    Returns sylviculture credit formula index, given treatment type and cover type.
+    Returns sylviculture credit formula index.
+    :param str treatment_type: Treatment type.
+    :param str cover_type: Cover type.
     """
     if treatment_type == 'ec':
         return 1 if cover_type.lower() in ['r', 'm'] else 2
@@ -714,8 +807,13 @@ def harv_cost(piece_size,
               A=1.97, B=0.405, C=0.169, D=0.164, E=0.202, F=13.6, G=8.83, K=0.,
               rv=False):
     """
-    Returns harvest cost, given piece size, treatment type (final cut or not), stand type (tolerant hardwood or not), partialcut "extra care" flag, and a series of regression coefficients (A, B, C, D, E, F, G, K, all with defaults [extracted from MERIS technical documentation; also see Sebastien Lacroix, BMMB]). 
-    Assumes that variables are deterministic.
+    Returns harvest cost.
+    :param float piece_size: Piece size.
+    :param bool is_finalcut:  Treatment type (final cut or not).
+    :param bool is_toleranthw: Stand type (tolerant hardwood or not).
+    :param bool partialcut_extracare: Partialcut "extra care" flag.
+    :param float A: series of regression coefficients (A, B, C, D, E, F, G, K, all with defaults [extracted from MERIS technical documentation; also see Sebastien Lacroix, BMMB]).
+    :param bool rv: Types of variables (default: Variables are deterministic).
     """
     _ifc = float(is_finalcut)
     _ith = float(is_toleranthw)
@@ -737,8 +835,14 @@ def harv_cost_rv(tv_mu, tv_sigma, N_mu, N_sigma, psr,
                  tv_min=50., N_min=200., ps_min=0.05,
                  E_fromintegral=False, e=0.01, n=1000):
     """
-    Returns harvest cost, given piece size, treatment type (final cut or not), stand type (tolerant hardwood or not), partialcut "extra care" flag, and a series of regression coefficients (A, B, C, D, E, F, G, K, all with defaults [extracted from MERIS technical documentation; also see Sebastien Lacroix, BMMB]). 
-    Assumes that variables are random variates (returns expected value of function, using PaCAL packages to model random variates, assuming normal distribution for all three variables).
+    Returns harvest cost.
+    :param float piece_size: Piece size.
+    :param bool is_finalcut:  Treatment type (final cut or not).
+    :param bool is_toleranthw: Stand type (tolerant hardwood or not).
+    :param bool partialcut_extracare: Partialcut "extra care" flag.
+    :param float A: series of regression coefficients (A, B, C, D, E, F, G, K, all with defaults [extracted from MERIS technical documentation; also see Sebastien Lacroix, BMMB]).
+    :param bool rv: Types of variables (default: Variables random variates (returns expected value of function, using PaCAL packages to model random variates, assuming normal distribution for all three variables)).
+
     Can use either PaCAL numerical integration (sssslow!), or custom numerical integration using Monte Carlo sampling (default).
     """
     # PaCAL overrides the | operator to implement conditional distributions
@@ -774,12 +878,12 @@ def harv_cost_wec(piece_size,
                   **kwargs):
     """
     Estimate harvest cost with error correction.
-    :float piece_size: mean piece size
-    :bool is_finalcut: True if harvest treatment is final cut, False otherwise
-    :bool is_toleranthw: True if tolerant hardwood cover type, False otherwise
-    :float sigma: standard deviation of piece size estimator
-    :int nsigmas: number of standard deviations to model on either side of the mean (default 3)
-    :float binw: width of bins for weighted numerical integration, in multiples of sigma (default 1.0)
+    :param float piece_size: mean piece size
+    :param bool is_finalcut: True if harvest treatment is final cut, False otherwise
+    :param bool is_toleranthw: True if tolerant hardwood cover type, False otherwise
+    :param float sigma: standard deviation of piece size estimator
+    :param int nsigmas: number of standard deviations to model on either side of the mean (default 3)
+    :param float binw: width of bins for weighted numerical integration, in multiples of sigma (default 1.0)
     """
     # bin centerpoints
     rv = norm(loc=piece_size, scale=sigma)
