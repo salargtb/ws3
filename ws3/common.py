@@ -887,13 +887,15 @@ def harv_cost_wec(piece_size,
                   **kwargs):
     """
     Estimate harvest cost with error correction.
-    :param float piece_size: mean piece size
+
+    :param float piece_size: Mean piece size.
     :param bool is_finalcut: True if harvest treatment is final cut, False otherwise.
     :param bool is_toleranthw: True if tolerant hardwood cover type, False otherwise.
-    :param float sigma: Standard deviation of piece size estimator.
+    :param bool sigma: Standard deviation of piece size estimator.
     :param int nsigmas: Number of standard deviations to model on either side of the mean (default 3).
     :param float binw: Width of bins for weighted numerical integration, in multiples of sigma (default 1.0).
 
+        
     """
 
     # bin centerpoints
