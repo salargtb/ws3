@@ -957,6 +957,11 @@ class Node:
         return not self._children
 
     def add_child(self, child):
+        """
+        The function adds a child node to the current object.
+        :param child: The child node to be added.
+    
+        """
         self._children.append(child)
 
     def parent(self):
