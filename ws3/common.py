@@ -229,7 +229,7 @@ def rasterize_stands(shp_path, tif_path, theme_cols, age_col, blk_col='', age_di
                      value_func=lambda x: re.sub(r'(-| )+', '_', str(x).lower()), cap_age=None,
                      verbose=False):
     """
-    The function rasterize stands data and store the data as TIFF file.
+    The function rasterizes stands data and stores the data as TIFF file.
 
     :param str shp_path: Path to the source shapefile.
     :param str tif_path: Path to the resulted TIFF file.
@@ -318,12 +318,28 @@ def rasterize_stands(shp_path, tif_path, theme_cols, age_col, blk_col='', age_di
         
 
 def hash_dt(dt, dtype=rasterio.int32, nbytes=4):
+    """
+    The function hashes the development type and returns an integer value.
+
+    :param str dt: Development type.
+    :param rasterio.dtype dtype: The type of the output file (default type is rasterio.int32).
+    :param int nbytes: The number of bytes to consider from the hash (The default value is 4).
+
+    """
     s = '.'.join(map(str, dt)).encode('utf-8')
     d = hashlib.md5(s).digest() # first n bytes of md5 digest
     return np.dtype(dtype).type(int(binascii.hexlify(d[:4]), 16))
 
 
 def warp_raster(src, dst_path, dst_crs={'init':'EPSG:4326'}):
+    """
+    The function warpes a raster from its original CRS to a new CRS.
+
+    :param raserio.DatasetReader src: The source rasterio dataset to be warped.
+    :param str dst_path: The path to save the warped raster
+    :param dict dst_crs: The destination CRS in rasterio format (Default is init':'EPSG:4326')
+
+    """
     from rasterio.warp import calculate_default_transform, reproject
     from rasterio.enums import Resampling
     dst_t, dst_w, dst_h = calculate_default_transform(src.crs, dst_crs, src.width, src.height, *src.bounds)
@@ -341,6 +357,13 @@ def warp_raster(src, dst_path, dst_crs={'init':'EPSG:4326'}):
 
 
 def timed(func):
+    """
+    The function records the execution time of a function.
+
+    :param function func: The function to be timed.
+
+
+    """
     def wrapper(*args):
         t = time.time()
         result = func(*args)
@@ -475,7 +498,8 @@ SPECIES_GROUPS_WOODSTOCK_QC  = {
 
 def is_num(s):
     """
-    Returns True if s is a number.
+    This function checks if a given input has a numerical value.
+        
     """
     try:
         float(s)
@@ -670,10 +694,18 @@ def _sylv_cred_f7(P,
 
 
 def sylv_cred(P, vr, vp, formula):
+    
     """
-    Returns sylviculture credit ($ per hectare), given P (volume harvested per hectare), vr (mean piece size of harvested stems), vp (mean piece size of stand before harvesting), and formula index (1 to 7).
-    Assumes that variables (P, vr, vp) are deterministic.
+    This function returns sylviculture credit ($ per hectare).
+
+    :param float P: Volume harvested per hectare.
+    :param float vr: Mean piece size of harvested stems.
+    :param float vp: mean piece size of stand before harvesting.
+    :param formula: formula index (1 to 7).
+
+        
     """
+
     f = {1:_sylv_cred_f1,
          2:_sylv_cred_f2,
          3:_sylv_cred_f3,
@@ -688,11 +720,20 @@ def sylv_cred_rv(P_mu, P_sigma, tv_mu, tv_sigma, N_mu, N_sigma, psr,
                  treatment_type=None, cover_type=None, formula=None,
                  P_min=20., tv_min=50., N_min=200., ps_min=0.05,
                  E_fromintegral=False, e=0.01, n=1000):
+
+    
     """
-    Returns sylviculture credit ($ per hectare), given P (volume harvested per hectare), vr (mean piece size of harvested stems), vp (mean piece size of stand before harvesting), and formula index (1 to 7).
-    Assumes that variables (P, vr, vp) are random variates (returns expected value of function, using PaCAL packages to model random variates, assuming normal distribution for all three variables).
-    Can use either PaCAL numerical integration (sssslow!), or custom numerical integration using Monte Carlo sampling (default).
+    This function returns sylviculture credit ($ per hectare).
+
+    :param float P: Volume harvested per hectare.
+    :param float vr: Mean piece size of harvested stems.
+    :param float vp: mean piece size of stand before harvesting.
+    :param formula: formula index (1 to 7).
+
+    .. Note:: Assumes that variables (P, vr, vp) are random variates (returns expected value of function, using PaCAL packages to model random variates, assuming normal distribution for all three variables).
+    Can use either PaCAL numerical integration (sssslow!), or custom numerical integration using Monte Carlo sampling (default).   
     """
+
     if treatment_type and cover_type:
         formula = sylv_cred_formula(treatment_type, cover_type)
     assert formula
@@ -732,7 +773,9 @@ def sylv_cred_rv(P_mu, P_sigma, tv_mu, tv_sigma, N_mu, N_sigma, psr,
 
 def sylv_cred_formula(treatment_type, cover_type):
     """
-    Returns sylviculture credit formula index, given treatment type and cover type.
+    Returns sylviculture credit formula index.
+    :param str treatment_type: Treatment type.
+    :param str cover_type: Cover type.
     """
     if treatment_type == 'ec':
         return 1 if cover_type.lower() in ['r', 'm'] else 2
@@ -766,11 +809,18 @@ def harv_cost(piece_size,
               is_toleranthw,
               partialcut_extracare=False,              
               A=1.97, B=0.405, C=0.169, D=0.164, E=0.202, F=13.6, G=8.83, K=0.,
-              rv=False):
+              rv=False): 
+
     """
-    Returns harvest cost, given piece size, treatment type (final cut or not), stand type (tolerant hardwood or not), partialcut "extra care" flag, and a series of regression coefficients (A, B, C, D, E, F, G, K, all with defaults [extracted from MERIS technical documentation; also see Sebastien Lacroix, BMMB]). 
-    Assumes that variables are deterministic.
+    Returns harvest cost.
+    :param float piece_size: Piece size.
+    :param bool is_finalcut:  Treatment type (final cut or not).
+    :param bool is_toleranthw: Stand type (tolerant hardwood or not).
+    :param bool partialcut_extracare: Partialcut "extra care" flag.
+    :param float A: series of regression coefficients (A, B, C, D, E, F, G, K, all with defaults [extracted from MERIS technical documentation; also see Sebastien Lacroix, BMMB]).
+    :param bool rv: Types of variables (default: Variables are deterministic).
     """
+
     _ifc = float(is_finalcut)
     _ith = float(is_toleranthw)
     _pce = float(partialcut_extracare)
@@ -790,11 +840,20 @@ def harv_cost_rv(tv_mu, tv_sigma, N_mu, N_sigma, psr,
                  partialcut_extracare=False,
                  tv_min=50., N_min=200., ps_min=0.05,
                  E_fromintegral=False, e=0.01, n=1000):
+
+
     """
-    Returns harvest cost, given piece size, treatment type (final cut or not), stand type (tolerant hardwood or not), partialcut "extra care" flag, and a series of regression coefficients (A, B, C, D, E, F, G, K, all with defaults [extracted from MERIS technical documentation; also see Sebastien Lacroix, BMMB]). 
-    Assumes that variables are random variates (returns expected value of function, using PaCAL packages to model random variates, assuming normal distribution for all three variables).
+    Returns harvest cost.
+    :param float piece_size: Piece size.
+    :param bool is_finalcut:  Treatment type (final cut or not).
+    :param bool is_toleranthw: Stand type (tolerant hardwood or not).
+    :param bool partialcut_extracare: Partialcut "extra care" flag.
+    :param float A: series of regression coefficients (A, B, C, D, E, F, G, K, all with defaults [extracted from MERIS technical documentation; also see Sebastien Lacroix, BMMB]).
+    :param bool rv: Types of variables (default: Variables random variates (returns expected value of function, using PaCAL packages to model random variates, assuming normal distribution for all three variables)).
+
     Can use either PaCAL numerical integration (sssslow!), or custom numerical integration using Monte Carlo sampling (default).
     """
+
     # PaCAL overrides the | operator to implement conditional distributions
     tv = pacal.NormalDistr(tv_mu, tv_sigma) | pacal.Gt(tv_min)
     N = pacal.NormalDistr(N_mu, N_sigma) | pacal.Gt(N_min)
@@ -828,12 +887,12 @@ def harv_cost_wec(piece_size,
                   **kwargs):
     """
     Estimate harvest cost with error correction.
-    :float piece_size: mean piece size
-    :bool is_finalcut: True if harvest treatment is final cut, False otherwise
-    :bool is_toleranthw: True if tolerant hardwood cover type, False otherwise
-    :float sigma: standard deviation of piece size estimator
-    :int nsigmas: number of standard deviations to model on either side of the mean (default 3)
-    :float binw: width of bins for weighted numerical integration, in multiples of sigma (default 1.0)
+    :param float piece_size: mean piece size
+    :param bool is_finalcut: True if harvest treatment is final cut, False otherwise
+    :param bool is_toleranthw: True if tolerant hardwood cover type, False otherwise
+    :param float sigma: standard deviation of piece size estimator
+    :param int nsigmas: number of standard deviations to model on either side of the mean (default 3)
+    :param float binw: width of bins for weighted numerical integration, in multiples of sigma (default 1.0)
     """
     # bin centerpoints
     rv = norm(loc=piece_size, scale=sigma)
@@ -888,21 +947,53 @@ class Node:
         self._children = []
 
     def is_root(self):
+    """
+    The function checks if the current object is the root node.
+    :return: True if the object is the root node, False otherwise
+
+    """
         return self._parent is None
 
     def is_leaf(self):
+    """
+    The function checks if the current object is a leaf node with no children.
+    :return: True if the object is a leaf node, False otherwise
+
+    """
         return not self._children
 
     def add_child(self, child):
+    """
+    The function adds a child node to the current object.
+    :param child: The child node to be added.
+
+    """
         self._children.append(child)
 
     def parent(self):
+    """
+    The function gets the parent node of the current object.
+    :return: The parent node.
+
+    """     
         return self._parent
 
     def children(self):
+    """
+    The function gets the list of child nodes of the current object.
+    :return: List of child nodes.
+
+    """ 
         return self._children
     
     def data(self, key=None):
+    """
+    The function gets the data associated with the current object.
+    If a specific key is provided, return the corresponding value.
+    If no key is provided, return the entire data dictionary.
+    :param key: The key to retrieve a specific value (default is None).
+
+    """
         if key:
             return self._data[key]
         else:
@@ -916,20 +1007,45 @@ class Tree:
         self._path = [self._nodes[0]]
 
     def children(self, nid):
+    """
+    The function gets the child nodes of the node with the specified ID.
+    :param nid: The ID of the node to retrieve children for.
+
+    """
         return [self._nodes[cid] for cid in self._nodes[nid].children()]
         
     def nodes(self):
+    """
+    The function returns all nodes
+
+    """
         return self._nodes
 
     def node(self, nid):
+    """
+    The function retruns a node with the specified ID.
+    :param nid: The unique identifier of the node to be retrieved.
+
+    """
         return self._nodes[nid]
     
     def add_node(self, data, parent=None):
+    """
+    The function adds a new node.
+    :param data: The data associated with the new node.
+    :param parent: The parent node to which the new node will be attached.
+
+    """
         n = Node(len(self._nodes), data, parent)
         self._nodes.append(n)
         return n
 
     def grow(self, data):
+    """
+    The function expands the current path by adding a new child node.
+    :param data: The data associated with the new node.
+
+    """
         parent = self._path[-1]
         child = self.add_node(data, parent=parent.nid)
         parent.add_child(child.nid)
@@ -937,12 +1053,24 @@ class Tree:
         return child
         
     def ungrow(self):
+    """
+    The function reduces the current path by removing the last node.
+
+    """
         self._path.pop()
         
     def leaves(self):
+    """
+    The function retruns all leaf nodes.
+
+    """
         return [n for n in self._nodes if n.is_leaf()]
     
     def root(self):
+    """
+    The function retruns the root node.
+
+    """
         return self._nodes[0]
     
     #def path(self):
@@ -952,6 +1080,11 @@ class Tree:
     #    return len(self._path) - 1
 
     def path(self, leaf=None):
+    """
+    The function retrieves the path from the root to a specific leaf node or to the currect path.
+    :param leaf: The leaf node for which the path is to be retrieved (Default if None).
+
+    """
         if not leaf: return self._path[1:]
         path = []
         n = leaf
@@ -963,6 +1096,10 @@ class Tree:
         return tuple(path)
     
     def paths(self):
+    """
+    The function retrieves paths from the root to all leaf nodes.
+
+    """
         return [self.path(leaf) for leaf in self.leaves()]
     
     #def draw(self):
