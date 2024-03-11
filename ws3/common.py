@@ -951,9 +951,19 @@ class Node:
         self._children = []
 
     def is_root(self):
+        """
+        The function checks if the current object is the root node.
+        :return: True if the object is the root node, False otherwise
+    
+        """
         return self._parent is None
 
     def is_leaf(self):
+        """
+        The function checks if the current object is a leaf node with no children.
+        :return: True if the object is a leaf node, False otherwise
+    
+        """
         return not self._children
 
     def add_child(self, child):
@@ -965,12 +975,29 @@ class Node:
         self._children.append(child)
 
     def parent(self):
+        """
+        The function gets the parent node of the current object.
+        :return: The parent node.
+    
+        """
         return self._parent
 
     def children(self):
+        """
+        The function gets the list of child nodes of the current object.
+        :return: List of child nodes.
+    
+        """ 
         return self._children
     
     def data(self, key=None):
+        """
+        The function gets the data associated with the current object.
+        If a specific key is provided, return the corresponding value.
+        If no key is provided, return the entire data dictionary.
+        :param key: The key to retrieve a specific value (default is None).
+    
+        """
         if key:
             return self._data[key]
         else:
@@ -984,20 +1011,45 @@ class Tree:
         self._path = [self._nodes[0]]
 
     def children(self, nid):
+        """
+        The function gets the child nodes of the node with the specified ID.
+        :param nid: The ID of the node to retrieve children for.
+    
+        """
         return [self._nodes[cid] for cid in self._nodes[nid].children()]
         
     def nodes(self):
+        """
+        The function returns all nodes
+    
+        """
         return self._nodes
 
     def node(self, nid):
+        """
+        The function retruns a node with the specified ID.
+        :param nid: The unique identifier of the node to be retrieved.
+    
+        """
         return self._nodes[nid]
     
     def add_node(self, data, parent=None):
+        """
+        The function adds a new node.
+        :param data: The data associated with the new node.
+        :param parent: The parent node to which the new node will be attached.
+    
+        """
         n = Node(len(self._nodes), data, parent)
         self._nodes.append(n)
         return n
 
     def grow(self, data):
+        """
+        The function expands the current path by adding a new child node.
+        :param data: The data associated with the new node.
+    
+        """
         parent = self._path[-1]
         child = self.add_node(data, parent=parent.nid)
         parent.add_child(child.nid)
@@ -1005,12 +1057,24 @@ class Tree:
         return child
         
     def ungrow(self):
+        """
+        The function reduces the current path by removing the last node.
+    
+        """
         self._path.pop()
         
     def leaves(self):
+        """
+        The function retruns all leaf nodes.
+    
+        """
         return [n for n in self._nodes if n.is_leaf()]
     
     def root(self):
+        """
+        The function retruns the root node.
+    
+        """
         return self._nodes[0]
     
     #def path(self):
@@ -1020,6 +1084,11 @@ class Tree:
     #    return len(self._path) - 1
 
     def path(self, leaf=None):
+        """
+        The function retrieves the path from the root to a specific leaf node or to the currect path.
+        :param leaf: The leaf node for which the path is to be retrieved (Default if None).
+    
+        """
         if not leaf: return self._path[1:]
         path = []
         n = leaf
@@ -1031,6 +1100,10 @@ class Tree:
         return tuple(path)
     
     def paths(self):
+        """
+        The function retrieves paths from the root to all leaf nodes.
+    
+        """
         return [self.path(leaf) for leaf in self.leaves()]
     
     #def draw(self):
