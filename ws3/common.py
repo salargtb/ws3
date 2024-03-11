@@ -951,11 +951,6 @@ class Node:
         self._children = []
 
     def is_root(self):
-    """
-    The function checks if the current object is the root node.
-    :return: True if the object is the root node, False otherwise
-
-    """
         return self._parent is None
 
     def is_leaf(self):
