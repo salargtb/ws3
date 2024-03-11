@@ -808,13 +808,17 @@ def harv_cost(piece_size,
               rv=False):
     """
     Returns harvest cost.
+
     :param float piece_size: Piece size.
-    :param bool is_finalcut:  Treatment type (final cut or not).
+    :param bool is_finalcut: Treatment type (final cut or not).
     :param bool is_toleranthw: Stand type (tolerant hardwood or not).
     :param bool partialcut_extracare: Partialcut "extra care" flag.
-    :param float A: series of regression coefficients (A, B, C, D, E, F, G, K, all with defaults [extracted from MERIS technical documentation; also see Sebastien Lacroix, BMMB]).
+    :param float A: Series of regression coefficients (A, B, C, D, E, F, G, K, all with defaults that are extracted from MERIS technical documentation; also see Sebastien Lacroix, BMMB).
     :param bool rv: Types of variables (default: Variables are deterministic).
+    
+        
     """
+
     _ifc = float(is_finalcut)
     _ith = float(is_toleranthw)
     _pce = float(partialcut_extracare)
@@ -834,17 +838,22 @@ def harv_cost_rv(tv_mu, tv_sigma, N_mu, N_sigma, psr,
                  partialcut_extracare=False,
                  tv_min=50., N_min=200., ps_min=0.05,
                  E_fromintegral=False, e=0.01, n=1000):
+
     """
     Returns harvest cost.
+
     :param float piece_size: Piece size.
-    :param bool is_finalcut:  Treatment type (final cut or not).
+    :param bool is_finalcut: Treatment type (final cut or not).
     :param bool is_toleranthw: Stand type (tolerant hardwood or not).
     :param bool partialcut_extracare: Partialcut "extra care" flag.
-    :param float A: series of regression coefficients (A, B, C, D, E, F, G, K, all with defaults [extracted from MERIS technical documentation; also see Sebastien Lacroix, BMMB]).
-    :param bool rv: Types of variables (default: Variables random variates (returns expected value of function, using PaCAL packages to model random variates, assuming normal distribution for all three variables)).
-
+    :param float A: Series of regression coefficients (A, B, C, D, E, F, G, K, all with defaults that are extracted from MERIS technical documentation; also see Sebastien Lacroix, BMMB).
+    :param bool rv: Types of variables (default: Variables random variates).
     Can use either PaCAL numerical integration (sssslow!), or custom numerical integration using Monte Carlo sampling (default).
+
+        
     """
+    
+
     # PaCAL overrides the | operator to implement conditional distributions
     tv = pacal.NormalDistr(tv_mu, tv_sigma) | pacal.Gt(tv_min)
     N = pacal.NormalDistr(N_mu, N_sigma) | pacal.Gt(N_min)
@@ -878,13 +887,14 @@ def harv_cost_wec(piece_size,
                   **kwargs):
     """
     Estimate harvest cost with error correction.
-    :param float piece_size: mean piece size
-    :param bool is_finalcut: True if harvest treatment is final cut, False otherwise
-    :param bool is_toleranthw: True if tolerant hardwood cover type, False otherwise
-    :param float sigma: standard deviation of piece size estimator
-    :param int nsigmas: number of standard deviations to model on either side of the mean (default 3)
-    :param float binw: width of bins for weighted numerical integration, in multiples of sigma (default 1.0)
+    :param float piece_size: mean piece size.
+    :param bool is_finalcut: True if harvest treatment is final cut, False otherwise.
+    :param bool is_toleranthw: True if tolerant hardwood cover type, False otherwise.
+    :param float sigma: Standard deviation of piece size estimator.
+    :param int nsigmas: Number of standard deviations to model on either side of the mean (default 3).
+    :param float binw: Width of bins for weighted numerical integration, in multiples of sigma (default 1.0).
     """
+
     # bin centerpoints
     rv = norm(loc=piece_size, scale=sigma)
     X = sorted([(piece_size + (sigma * (i - (1. * 0.5)) * sign)) 
